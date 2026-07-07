@@ -1,58 +1,48 @@
-name: Clinic API CI/CD
+name: CI/CD Pipeline
 
 on:
   push:
-    branches:
-      - main
-
+    branches: [ main ]
   pull_request:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: "9.0.x"
+    - name: Create Firebase credentials file
+      run: |
+        mkdir -p Backend/Clinic/Firebase
+        echo '${{ secrets.FIREBASE_CREDENTIALS }}' > Backend/Clinic/Firebase/clinic-firebase.json
 
-      - name: Restore Packages
-        run: dotnet restore Backend/Clinic.sln
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x'
 
-      - name: Build Solution
-        run: dotnet build Backend/Clinic.sln --configuration Release --no-restore
+    - name: Restore dependencies
+      run: dotnet restore Backend/Clinic.sln
 
-      - name: Create Firebase Credentials
-        if: github.ref == 'refs/heads/main'
-        run: |
-          mkdir -p Backend/Clinic/Firebase
-          cat <<EOF > Backend/Clinic/Firebase/clinic-firebase.json
-          ${{ secrets.FIREBASE_CREDENTIALS }}
-          EOF
+    - name: Build
+      run: dotnet build Backend/Clinic.sln -c Release --no-restore
 
-      - name: Login to Docker Hub
-        if: github.ref == 'refs/heads/main'
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+    - name: Login to Docker Hub
+      if: github.ref == 'refs/heads/main'
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and Push Docker Image
-        if: github.ref == 'refs/heads/main'
-        uses: docker/build-push-action@v6
-        with:
-          context: ./Backend
-          push: true
-          tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/clinic-api:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/clinic-api:${{ github.sha }}
-
-      - name: Cleanup Firebase Credentials
-        if: always()
-        run: rm -f Backend/Clinic/Firebase/clinic-firebase.json
+    - name: Build and Push Docker Image
+      if: github.ref == 'refs/heads/main'
+      uses: docker/build-push-action@v5
+      with:
+        context: ./Backend
+        push: true
+        tags: |
+          ${{ secrets.DOCKERHUB_USERNAME }}/clinic-api:latest
+          ${{ secrets.DOCKERHUB_USERNAME }}/clinic-api:${{ github.sha }}
