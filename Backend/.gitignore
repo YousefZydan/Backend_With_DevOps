@@ -1,5 +1,5 @@
 # Ignore appsettings
-appsettings.json
+
 appsettings.Development.json
 Clinic/Firebase/clinic-firebase.json
 # Or any environment configs
@@ -11,3 +11,16 @@ obj/
 .vs/
 *.user
 *.suo
+Clinic/Firebase/clinic-firebase.json
+
+# Environment Variables
+.env
+.env.*
+
+!.env.example
+
+
+# Firebase
+Clinic/Firebase/
+
+
