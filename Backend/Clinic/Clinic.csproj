@@ -10,12 +10,6 @@
 	</PropertyGroup>
 
 	<!-- Firebase file publish configuration -->
-<ItemGroup>
-	<None Include="Firebase\clinic-firebase.json">
-		<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		<CopyToPublishDirectory>Always</CopyToPublishDirectory>
-	</None>
-</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="FirebaseAdmin" Version="3.5.0" />
 		<PackageReference Include="Google.Apis.Auth" Version="1.73.0" />
