@@ -1,0 +1,15 @@
+services:
+  clinic-api:
+    image: clinic-api:v1
+    container_name: clinic-api
+
+    ports:
+      - "5000:8080"
+
+    env_file:
+      - .env
+
+    volumes:
+      - ./Clinic/Firebase:/app/Firebase:ro
+
+    restart: unless-stopped

@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: clinic-api
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: clinic-api
+
+  template:
+    metadata:
+      labels:
+        app: clinic-api
+
+    spec:
+      containers:
+      - name: clinic-api
+        image: yousefzydan/clinic-api:latest
+
+        ports:
+        - containerPort: 8080
+
+        envFrom:
+        - secretRef:
+            name: clinic-secrets
+
+        volumeMounts:
+        - name: firebase-volume
+          mountPath: /app/Firebase
+          readOnly: true
+
+      volumes:
+      - name: firebase-volume
+        secret:
+          secretName: firebase-secret
