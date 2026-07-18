@@ -23,6 +23,10 @@ builder.Host.UseSerilog();
 
 // ---------- Services ----------
 builder.Services.AddControllers();
+
+builder.Services.AddHealthChecks();
+
+
 builder.Services.AddServices(builder.Configuration);
 
 builder.Services.AddEndpointsApiExplorer();
@@ -126,6 +130,10 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapHealthChecks("/health");
+
+
 
 app.MapHub<NotificationHub>("/notificationHub");
 

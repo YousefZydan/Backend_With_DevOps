@@ -3,7 +3,7 @@ kind: Deployment
 
 metadata:
   name: clinic-api
-
+  namespace: clinic
 spec:
   replicas: 1
 
@@ -25,6 +25,9 @@ spec:
         - containerPort: 8080
 
         envFrom:
+        - configMapRef:
+            name: clinic-config
+
         - secretRef:
             name: clinic-secrets
 
