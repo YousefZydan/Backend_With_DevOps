@@ -4,6 +4,7 @@ kind: Deployment
 metadata:
   name: clinic-api
   namespace: clinic
+
 spec:
   replicas: 1
 
@@ -20,14 +21,40 @@ spec:
       containers:
       - name: clinic-api
         image: yousefzydan/clinic-api:latest
-
+        imagePullPolicy: Always
         ports:
         - containerPort: 8080
+
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 0
+          periodSeconds: 5
+          timeoutSeconds: 2
+          failureThreshold: 12
+
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 2
+          failureThreshold: 3
+
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 2
+          failureThreshold: 3
 
         envFrom:
         - configMapRef:
             name: clinic-config
-
         - secretRef:
             name: clinic-secrets
 

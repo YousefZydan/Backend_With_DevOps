@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-and-push:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
     - name: Checkout code
@@ -24,6 +24,9 @@ jobs:
 
     - name: Build
       run: dotnet build Backend/Clinic.sln -c Release --no-restore
+
+    - name: Run Tests
+      run: dotnet test Backend/Clinic.sln -c Release --no-build
 
     - name: Login to Docker Hub
       if: github.ref == 'refs/heads/main'
@@ -41,3 +44,7 @@ jobs:
         tags: |
           ${{ secrets.DOCKERHUB_USERNAME }}/clinic-api:latest
           ${{ secrets.DOCKERHUB_USERNAME }}/clinic-api:${{ github.sha }}
+    - name: Restart Deployment
+      if: github.ref == 'refs/heads/main'
+      run: |
+        kubectl rollout restart deployment clinic-api -n clinic
